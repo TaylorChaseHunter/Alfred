@@ -3,7 +3,6 @@ import discord
 import random
 from dotenv import load_dotenv
 
-# filler #
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.all()

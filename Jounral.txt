@@ -1,0 +1,6 @@
+
+[1/13/2022]
+I forgot to start this whenever I started the project -- So it goes. Either way, now the model seems to be in
+a state that's ready to train and save its weights. Early estimate for training time is 200 minutes, so I'm
+going to let that run in the background and pray it'll not break halfway through. If it works, Alfred will be
+able to say some really messed up crap, and that's pretty exciting.

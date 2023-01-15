@@ -36,7 +36,8 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-Alfred is a discord bot intended to grow in both intelligence and capability as he continues to serve the hobos.
+Alfred is a discord bot intended to grow in both intelligence and capability as he continues to serve the hobos. He contains functions for different query and 
+conversational needs, including retrieving aspects of the book clubs constitution and previous books. 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -54,8 +55,10 @@ Coming Soon
 ## Roadmap
 
 - [X] Simply refactor for the moment.
-- [ ] Refactor and compartmentalize the repository with future goals in mind. 
-- [ ] Implement DL models for automatic quote generation. 
+- [X] Implement DL models for automatic quote generation. 
+- [ ] Refine and implement the text generations into the model. 
+- [ ] Create a method for retreiving book reviews from the internet.
+- [ ] Create method for summarizing book summaries after an internet query for the titles.
 
 See the [open issues](https://github.com/TaylorChaseHunter/Alfred/issues) for a full list of proposed features (and known issues).
 

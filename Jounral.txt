@@ -4,3 +4,11 @@ I forgot to start this whenever I started the project -- So it goes. Either way,
 a state that's ready to train and save its weights. Early estimate for training time is 200 minutes, so I'm
 going to let that run in the background and pray it'll not break halfway through. If it works, Alfred will be
 able to say some really messed up crap, and that's pretty exciting.
+
+[1/15/2022]
+So, to my surprise, the model trained overnight. This means I was able to load the weights into a model and
+actually test them for once. Results were as expected -- pretty crap, but this leaves me hopeful. This less
+than a third of the intended training time, and it did manage to string together words at times. There is
+of course a couple of obstacles still in the way before I do triple the training time, but this is
+definitely a proof of concept. I suppose my next steps can be maybe to clean and study my data a little
+more intensely, then set the model to train for a couple of days.

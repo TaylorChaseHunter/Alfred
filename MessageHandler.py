@@ -1,4 +1,9 @@
+from selenium.common.exceptions import NoSuchElementException, ElementNotInteractableException
 from discord import Message, Client
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from datetime import datetime
+import time
 import os
 import random
 
@@ -9,15 +14,96 @@ BOOKS = ["2021:", "Incognito", "Flowers for Algernon", "Mice of men", "1984",
          "Cats cradle", "Cosmos", "Born to Run", "Farewell to Arms", "The Right Stuff",
          "The Hitchikers Guide to the Galaxy"]
 
+
 class MessageHandler:
 
     def __init__(self):
-        pass
+        self.options = Options()
+        self.options.add_argument('--headless')
+        self.options.add_argument('--disable-gpu')
+        self.driver = None
+        self.drive_path = 'chromedriver.exe'
+
+    def handle_fetch(self, message: Message) -> str:
+
+        self.driver = webdriver.Chrome(self.drive_path, chrome_options=self.options)
+        book_title = message.content.lower()[6:]
+
+        # Handle logic for looking title up #
+        # https://www.goodreads.com/search?q=slaughterhouse+five
+        search_string = f"https://www.goodreads.com/search?q={book_title}"
+
+        self.driver.get(search_string)
+
+        time.sleep(1)
+
+        rating = self.find_rating()
+        summary = self.find_summary()
+
+        self.driver.quit()
+
+        return self.create_return_fetch(book_title, rating, summary)
+
+    def create_return_fetch(self, book_title: str, rating: str, summary: str) -> str:
+        response = f"{book_title.title()}:\n\n Goodreads rates the book: {rating}\n" \
+                   f"\nSummary:\n{summary}"
+        return response
+
+    def find_rating(self) -> str:
+        book_link = self.driver.find_elements_by_class_name("bookTitle")[0]
+        book_link.click()
+        time.sleep(1)
+
+        # Deals with pop-ups and ever-changing goodreads layouts.
+        try:
+            rating = self.driver.find_element_by_xpath("//span[contains(@itemprop, 'ratingValue')]").text
+        except NoSuchElementException:
+            try:
+                self.driver.find_element_by_xpath("/html/body/div[3]/div/div/div[1]/button").click()
+                rating = self.driver.find_element_by_xpath("//span[contains(@itemprop, 'ratingValue')]").text
+            except NoSuchElementException:
+                self.driver.find_element_by_xpath("/html/body/div[3]/div/div[1]/div/div").click()
+                rating = self.driver.find_element_by_xpath(
+                    "//*[@id=\"ReviewsSection\"]/div[4]/div[1]/div[1]/div/div[1]/div"
+                ).text
+
+        print("\nRATING RECEIVED\n")
+        return rating
+
+    def find_summary(self):
+
+        try:
+            self.driver.find_element_by_xpath("/html/body/div[3]/div/div[1]/div/div/button").click()
+        except NoSuchElementException:
+            self.driver.find_element_by_xpath("/html/body/div[3]/div/div/div[1]/button").click()
+        except ElementNotInteractableException:
+            pass
+
+        time.sleep(1)
+        try:
+            summary = self.driver.find_element_by_xpath("//*[@id=\"description\"]").text
+        except NoSuchElementException:
+            try:
+                summary = self.driver.find_element_by_xpath("//span[contains(@class,'Formatted')]").text
+            except NoSuchElementException:
+                summary = self.driver.find_element_by_xpath(
+                    "//*[@id=\"__next\"]/div/main/div[1]/div[2]/div[2]/div[2]/div[4]"
+                ).text
+        return summary
 
     def handle_message(self, message: Message, client: Client) -> str:
 
         if message.author == client.user:
             return ""
+
+        # Retrieve  #
+        elif message.content.lower()[:5] == "fetch":
+            try:
+                return self.handle_fetch(message)
+            except Exception as e:
+                print("ERROR: ", e)
+                self.driver.quit()
+                return "I could not find that master."
     
         elif message.content.lower() == "hello alfred":
             return "Good morrow"
@@ -104,3 +190,5 @@ class MessageHandler:
                          "Those who wish to sing always find a song. At the touch of a lover, everyone becomes a poet."]
             response = random.choice(responses)
             return response
+
+        return ""

@@ -11,7 +11,7 @@ from tensorflow.keras.layers import LSTM
 from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.utils import to_categorical
 
-df = pd.read_pickle('data/quotes.pkl')
+df = pd.read_pickle('../data/quotes.pkl')
 df = df.drop(['Author', 'Tags'], axis=1)
 df = df.apply(lambda x: x.astype(str).str.lower())
 quotes = df['Quote'].to_list()

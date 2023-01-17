@@ -22,26 +22,26 @@ class MessageHandler:
         self.options.add_argument('--headless')
         self.options.add_argument('--disable-gpu')
         self.driver = None
-        self.drive_path = 'chromedriver.exe'
+        self.drive_path = '../chromedriver.exe'
 
     def handle_fetch(self, message: Message) -> str:
+        """
+            Initial logic to handle a selenium 'fetch' call.
+        """
 
         self.driver = webdriver.Chrome(self.drive_path, chrome_options=self.options)
+
+        # Create url to search #
         book_title = message.content.lower()[6:]
-
-        # Handle logic for looking title up #
-        # https://www.goodreads.com/search?q=slaughterhouse+five
         search_string = f"https://www.goodreads.com/search?q={book_title}"
-
         self.driver.get(search_string)
 
+        # Sleep to avoid errors due to slow loading
         time.sleep(1)
 
         rating = self.find_rating()
         summary = self.find_summary()
-
         self.driver.quit()
-
         return self.create_return_fetch(book_title, rating, summary)
 
     def create_return_fetch(self, book_title: str, rating: str, summary: str) -> str:
@@ -50,8 +50,15 @@ class MessageHandler:
         return response
 
     def find_rating(self) -> str:
+        """
+            Grabs the star rating from goodreads website.
+        """
+
+        # Click the first option from the search list
         book_link = self.driver.find_elements_by_class_name("bookTitle")[0]
         book_link.click()
+
+        # Sleep to allow page to load
         time.sleep(1)
 
         # Deals with pop-ups and ever-changing goodreads layouts.
@@ -67,11 +74,14 @@ class MessageHandler:
                     "//*[@id=\"ReviewsSection\"]/div[4]/div[1]/div[1]/div/div[1]/div"
                 ).text
 
-        print("\nRATING RECEIVED\n")
         return rating
 
-    def find_summary(self):
+    def find_summary(self) -> str:
+        """
+            Grabs the summary section from goodreads page
+        """
 
+        # Tries to close out any add that might be blocking the screen #
         try:
             self.driver.find_element_by_xpath("/html/body/div[3]/div/div[1]/div/div/button").click()
         except NoSuchElementException:
@@ -79,7 +89,10 @@ class MessageHandler:
         except ElementNotInteractableException:
             pass
 
+        # Sleep to allow the page to load #
         time.sleep(1)
+
+        # Tries to identify the summary section for both goodreads layouts that might occur #
         try:
             summary = self.driver.find_element_by_xpath("//*[@id=\"description\"]").text
         except NoSuchElementException:
@@ -92,6 +105,9 @@ class MessageHandler:
         return summary
 
     def handle_message(self, message: Message, client: Client) -> str:
+        """
+            Manually checks content of every discord message and heuristically decides action.
+        """
 
         if message.author == client.user:
             return ""
@@ -123,7 +139,7 @@ class MessageHandler:
                    "pick one that I did not enjoy as much as others, I'd sadly say Cold Mountain."
 
         elif message.content.lower() == "alfred, list the constitution":
-            dir_list = os.listdir('constitution')
+            dir_list = os.listdir('../constitution')
             for file in dir_list:
                 with open('constitution/' + file, 'r') as r:
                     data = r.read()

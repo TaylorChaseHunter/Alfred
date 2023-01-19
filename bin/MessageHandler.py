@@ -2,9 +2,8 @@ from selenium.common.exceptions import NoSuchElementException, ElementNotInterac
 from discord import Message, Client
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from datetime import datetime
+import configparser
 import time
-import sys
 import os
 import random
 
@@ -19,11 +18,17 @@ BOOKS = ["2021:", "Incognito", "Flowers for Algernon", "Mice of men", "1984",
 class MessageHandler:
 
     def __init__(self):
+
+        parser = configparser.ConfigParser()
+        parser.read( r'C:\\Users\\sepro\\PycharmProjects\\AlfredBot\\config.ini')
         self.options = Options()
-        self.options.add_argument('--headless')
-        self.options.add_argument('--disable-gpu')
+
+        if parser.getboolean('WebScrapper', 'Headless'):
+            self.options.add_argument('--headless')
+            self.options.add_argument('--disable-gpu')
+
         self.driver = None
-        self.drive_path = r'../chromedriver.exe'
+        self.drive_path = r'C:\\Users\\sepro\\PycharmProjects\\AlfredBot\\chromedriver.exe'
 
     def handle_fetch(self, message: Message) -> str:
         """

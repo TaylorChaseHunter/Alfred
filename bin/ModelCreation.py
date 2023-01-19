@@ -5,6 +5,7 @@
 import os
 import pandas as pd
 import numpy as np
+import configparser
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Dropout
@@ -19,6 +20,13 @@ class ModelCreator:
     """
 
     def __init__(self):
+
+        parser = configparser.ConfigParser()
+        parser.read('../config.ini')
+
+        self.num_of_layers = parser.getint('Model', 'HiddenLayers')
+        self.layer_size = parser.getint('Model', 'LayerSize')
+
         self.X = None
         self.y = None
 
@@ -72,9 +80,12 @@ class ModelCreator:
 
         # define the LSTM model
         model = Sequential()
-        model.add(LSTM(256, input_shape=(self.X.shape[1], self.X.shape[2])))
+
+        for layer in range(self.num_of_layers):
+            model.add(LSTM(self.layer_size, input_shape=(self.X.shape[1], self.X.shape[2])))
+
         model.add(Dropout(0.2))
-        model.add(Dense(y.shape[1], activation='softmax'))
+        model.add(Dense(self.y.shape[1], activation='softmax'))
         model.compile(loss='categorical_crossentropy', optimizer='adam')
 
         # define the checkpoint

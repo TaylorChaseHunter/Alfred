@@ -1,6 +1,10 @@
+"""
+    This creates the discord bots servers then passes of most
+    other responsibility to helper functions and classes.
+"""
+
 import os
 import discord
-import random
 from dotenv import load_dotenv
 from MessageHandler import MessageHandler
 

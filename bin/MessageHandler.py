@@ -4,6 +4,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from datetime import datetime
 import time
+import sys
 import os
 import random
 
@@ -22,14 +23,14 @@ class MessageHandler:
         self.options.add_argument('--headless')
         self.options.add_argument('--disable-gpu')
         self.driver = None
-        self.drive_path = '../chromedriver.exe'
+        self.drive_path = r'../chromedriver.exe'
 
     def handle_fetch(self, message: Message) -> str:
         """
             Initial logic to handle a selenium 'fetch' call.
         """
 
-        self.driver = webdriver.Chrome(self.drive_path, chrome_options=self.options)
+        self.driver = webdriver.Chrome(executable_path=self.drive_path, options=self.options)
 
         # Create url to search #
         book_title = message.content.lower()[6:]
@@ -118,7 +119,8 @@ class MessageHandler:
                 return self.handle_fetch(message)
             except Exception as e:
                 print("ERROR: ", e)
-                self.driver.quit()
+                if self.driver is not None:
+                    self.driver.quit()
                 return "I could not find that master."
     
         elif message.content.lower() == "hello alfred":
